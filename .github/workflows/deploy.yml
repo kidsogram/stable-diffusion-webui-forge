@@ -11,6 +11,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    # --- ADD THIS STEP TO SET UP BUILDX WITH THE CONTAINER DRIVER ---
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver: docker-container # Specify the docker-container driver for caching
+        cache-from: type=gha # This line is now valid with the container driver
+        cache-to: type=gha,mode=max # This line is now valid with the container driver
+    # ----------------------------------------------------------------
+    
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -25,5 +34,6 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/webui-forge-salad:latest
           ${{ secrets.DOCKER_USERNAME }}/webui-forge-salad:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Remove cache-from and cache-to from here, as they are now handled by setup-buildx-action
+        # cache-from: type=gha
+        # cache-to: type=gha,mode=max
